@@ -1,8 +1,29 @@
 import React, { Component } from 'react';
 import { Form } from 'react-bootstrap';
+import { getCategories } from '../services/api';
 
 class Home extends Component {
+  constructor() {
+    super();
+    this.state = {
+      categoria: [],
+    };
+  }
+
+  componentDidMount() {
+    this.handlelist();
+  }
+
+  async handlelist() {
+    // const { categoria } = this.state;
+    const response = await getCategories();
+    this.setState(({
+      categoria: response,
+    }));
+  }
+
   render() {
+    const { categoria } = this.state;
     return (
       <Form>
         <Form.Group>
