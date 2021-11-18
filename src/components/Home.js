@@ -34,6 +34,16 @@ class Home extends Component {
           </Form.Label>
           <Form.Control type="text" />
         </Form.Group>
+        <div>
+          {categoria.map((value) => (
+            <div
+              key={ value.id }
+              data-testid="category"
+            >
+              {value.name}
+            </div>
+          ))}
+        </div>
       </Form>
     );
   }
