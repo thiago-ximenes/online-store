@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form } from 'react-bootstrap';
+import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
 
 class Home extends Component {
   render() {
@@ -13,6 +14,7 @@ class Home extends Component {
           </Form.Label>
           <Form.Control type="text" />
         </Form.Group>
+        <ShoppingCartButton />
       </Form>
     );
   }
