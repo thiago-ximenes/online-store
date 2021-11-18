@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form } from 'react-bootstrap';
+import { Form, Button } from 'react-bootstrap';
 import { getCategories } from '../services/api';
 
 class Home extends Component {
@@ -15,7 +15,6 @@ class Home extends Component {
   }
 
   async handlelist() {
-    // const { categoria } = this.state;
     const response = await getCategories();
     this.setState(({
       categoria: response,
@@ -36,12 +35,13 @@ class Home extends Component {
         </Form.Group>
         <div>
           {categoria.map((value) => (
-            <div
+            <Button
+              variant="link"
               key={ value.id }
               data-testid="category"
             >
               {value.name}
-            </div>
+            </Button>
           ))}
         </div>
       </Form>
