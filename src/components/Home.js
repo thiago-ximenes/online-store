@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
 import ProductCard from './ProductCard';
+import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
 
 class Home extends Component {
   constructor() {
@@ -66,6 +67,7 @@ class Home extends Component {
           >
             Buscar
           </Button>
+          <ShoppingCartButton />
         </Form>
         <div>
           {category.map((value) => (
