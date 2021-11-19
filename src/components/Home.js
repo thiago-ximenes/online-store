@@ -40,17 +40,12 @@ class Home extends Component {
       btnInput = input;
     }
     const response = await getProductsFromCategoryAndQuery(category, btnInput);
-    console.log(response.results);
     this.setState(({
       listProducts: response.results,
       status: response.results.length === 0,
       input: '',
     }));
   }
-
-  teste = () => {
-    
-  } 
 
   render() {
     const { category, input, listProducts, status } = this.state;
@@ -91,13 +86,12 @@ class Home extends Component {
             </Button>
           ))}
         </div>
-        <div>
-          { status ? (<span> Nenhum produto foi encontrado</span>) : (
-            listProducts.map((product) => (
+        { status ? (<span> Nenhum produto foi encontrado</span>) : (
+          listProducts.map((product) => (
+            <div key={ product.id }>
               <Link
-                to={ { pathname: '/product-details' } }
-                key={ product.id }
-                onClick={ teste }
+                to={ `/product-details/${product.id}` }
+                data-testid="product-detail-link"
               >
                 <ProductCard
                   product={ product.title }
@@ -105,8 +99,8 @@ class Home extends Component {
                   img={ product.thumbnail }
                 />
               </Link>
-            )))}
-        </div>
+            </div>
+          )))}
       </>
     );
   }

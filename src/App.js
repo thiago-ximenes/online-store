@@ -9,15 +9,9 @@ function App() {
   return (
     <BrowserRouter>
       <Switch>
-        <Route exact path="/">
-          <Home />
-        </Route>
-        <Route exact path="/shopping-cart">
-          <ShoppingCartPage />
-        </Route>
-        <Route exact path="/product-details">
-          <ProductDetails />
-        </Route>
+        <Route exact path="/" component={ Home } />
+        <Route exact path="/shopping-cart" component={ ShoppingCartPage } />
+        <Route exact path="/product-details/:id" component={ ProductDetails } />
       </Switch>
     </BrowserRouter>
   );
