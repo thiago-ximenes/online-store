@@ -33,12 +33,16 @@ class Home extends Component {
     }));
   }
 
-  handleClick = async () => {
+  handleClick = async (category = null, btnInput) => {
     const { input } = this.state;
-    const response = await getProductsFromCategoryAndQuery(null, input);
+    if (input !== '' && btnInput !== null) {
+      btnInput = input;
+    }
+    const response = await getProductsFromCategoryAndQuery(category, btnInput);
     this.setState(({
       listProducts: response.results,
       status: response.results.length === 0,
+      input: '',
     }));
   }
 
@@ -75,6 +79,7 @@ class Home extends Component {
               variant="link"
               key={ value.id }
               data-testid="category"
+              onClick={ () => handleClick(value.id, null) }
             >
               {value.name}
             </Button>
