@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
 import ProductCard from './ProductCard';
 import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
@@ -39,12 +40,17 @@ class Home extends Component {
       btnInput = input;
     }
     const response = await getProductsFromCategoryAndQuery(category, btnInput);
+    console.log(response.results);
     this.setState(({
       listProducts: response.results,
       status: response.results.length === 0,
       input: '',
     }));
   }
+
+  teste = () => {
+    
+  } 
 
   render() {
     const { category, input, listProducts, status } = this.state;
@@ -88,12 +94,17 @@ class Home extends Component {
         <div>
           { status ? (<span> Nenhum produto foi encontrado</span>) : (
             listProducts.map((product) => (
-              <ProductCard
+              <Link
+                to={ { pathname: '/product-details' } }
                 key={ product.id }
-                product={ product.title }
-                price={ product.price }
-                img={ product.thumbnail }
-              />
+                onClick={ teste }
+              >
+                <ProductCard
+                  product={ product.title }
+                  price={ product.price }
+                  img={ product.thumbnail }
+                />
+              </Link>
             )))}
         </div>
       </>
