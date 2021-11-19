@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { getCategories } from '../services/api';
+import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
+import ProductCard from './ProductCard';
 
 class Home extends Component {
   constructor() {
     super();
     this.state = {
-      categoria: [],
+      category: [],
+      input: '',
+      listProducts: [],
+      status: false,
     };
   }
 
@@ -17,24 +21,54 @@ class Home extends Component {
   async handlelist() {
     const response = await getCategories();
     this.setState(({
-      categoria: response,
+      category: response,
+    }));
+  }
+
+  handleChange = ({ target }) => {
+    const { value } = target;
+    this.setState(({
+      input: value,
+    }));
+  }
+
+  handleClick = async () => {
+    const { input } = this.state;
+    const response = await getProductsFromCategoryAndQuery(null, input);
+    this.setState(({
+      listProducts: response.results,
+      status: response.results.length === 0,
     }));
   }
 
   render() {
-    const { categoria } = this.state;
+    const { category, input, listProducts, status } = this.state;
+    const { handleChange, handleClick } = this;
     return (
-      <Form>
-        <Form.Group>
-          <Form.Label
-            data-testid="home-initial-message"
+      <>
+        <Form>
+          <Form.Group>
+            <Form.Label
+              data-testid="home-initial-message"
+            >
+              Digite algum termo de pesquisa ou escolha uma categoria.
+            </Form.Label>
+            <Form.Control
+              type="text"
+              onChange={ handleChange }
+              value={ input }
+              data-testid="query-input"
+            />
+          </Form.Group>
+          <Button
+            data-testid="query-button"
+            onClick={ handleClick }
           >
-            Digite algum termo de pesquisa ou escolha uma categoria.
-          </Form.Label>
-          <Form.Control type="text" />
-        </Form.Group>
+            Buscar
+          </Button>
+        </Form>
         <div>
-          {categoria.map((value) => (
+          {category.map((value) => (
             <Button
               variant="link"
               key={ value.id }
@@ -44,7 +78,18 @@ class Home extends Component {
             </Button>
           ))}
         </div>
-      </Form>
+        <div>
+          { status ? (<span> Nenhum produto foi encontrado</span>) : (
+            listProducts.map((product) => (
+              <ProductCard
+                key={ product.id }
+                product={ product.title }
+                price={ product.price }
+                img={ product.thumbnail }
+              />
+            )))}
+        </div>
+      </>
     );
   }
 }
