@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
 import ProductCard from './ProductCard';
 import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
@@ -85,17 +86,21 @@ class Home extends Component {
             </Button>
           ))}
         </div>
-        <div>
-          { status ? (<span> Nenhum produto foi encontrado</span>) : (
-            listProducts.map((product) => (
-              <ProductCard
-                key={ product.id }
-                product={ product.title }
-                price={ product.price }
-                img={ product.thumbnail }
-              />
-            )))}
-        </div>
+        { status ? (<span> Nenhum produto foi encontrado</span>) : (
+          listProducts.map((product) => (
+            <div key={ product.id }>
+              <Link
+                to={ `/product-details/${product.id}` }
+                data-testid="product-detail-link"
+              >
+                <ProductCard
+                  product={ product.title }
+                  price={ product.price }
+                  img={ product.thumbnail }
+                />
+              </Link>
+            </div>
+          )))}
       </>
     );
   }
