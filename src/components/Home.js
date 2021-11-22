@@ -97,6 +97,7 @@ class Home extends Component {
                   product={ product.title }
                   price={ product.price }
                   img={ product.thumbnail }
+                  productId={ product.id } // adicionando esse novo pro product card receber
                 />
               </Link>
             </div>

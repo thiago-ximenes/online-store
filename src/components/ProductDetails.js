@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Card, Button } from 'react-bootstrap';
 import { PropTypes } from 'prop-types';
 import { getProductById } from '../services/api';
+import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
 
 class ProductDetails extends Component {
   constructor() {
@@ -11,12 +12,16 @@ class ProductDetails extends Component {
       img: '',
       priceProduct: 0,
       atributtesProduct: [],
+      productId: '',
+      productQuantity: 0,
     };
+    this.tryToGet = this.tryToGet.bind(this);
   }
 
   componentDidMount() {
     const { props: { match: { params: { id } } } } = this;
     this.getProduct(id);
+    this.getQuantity(id);
   }
 
   getProduct = async (id) => {
@@ -27,13 +32,61 @@ class ProductDetails extends Component {
       img: response.thumbnail,
       priceProduct: response.price,
       atributtesProduct: [...response.attributes],
+      productId: response.id,
     }));
   };
 
+  // pegar a quantidade quando inicia a página
+  getQuantity(id) {
+    this.setState({
+      productId: id,
+    });
+    const productsBought = localStorage.getItem(`${id}`);
+    if (productsBought === null) {
+      this.setState({
+        productQuantity: 0,
+      });
+    } else {
+      this.setState({
+        productQuantity: productsBought,
+      });
+    }
+  }
+
+  // quando carregar tentar pegar uma key igual ao productId // localstorage getItem
+  tryToGet(productId) {
+    this.setState({
+      productId,
+    });
+    const productsBought = localStorage.getItem(`${productId}`);
+    if (productsBought === null) {
+      localStorage.setItem(`${productId}`, 1);
+      console.log(localStorage.getItem(`${productId}`));
+      this.setState({
+        productQuantity: localStorage.getItem(`${productId}`),
+      });
+    } else {
+      const actualQuantity = parseInt(localStorage.getItem(`${productId}`) ?? '0', 10);
+      localStorage.setItem(`${productId}`, (actualQuantity + 1).toString());
+      console.log(localStorage.getItem(`${productId}`));
+      this.setState({
+        productQuantity: localStorage.getItem(`${productId}`),
+      });
+    }
+  }
+
   render() {
-    const { productName, img, priceProduct, atributtesProduct } = this.state;
+    const {
+      productName,
+      img,
+      priceProduct,
+      atributtesProduct,
+      productId,
+      productQuantity,
+    } = this.state;
     return (
       <div>
+        <ShoppingCartButton data-testid="shopping-cart-button" />
         <Card style={ { width: '18rem' } } data-testid="product">
           <Card.Body>
             <p data-testid="product-detail-name">{ productName }</p>
@@ -53,10 +106,17 @@ class ProductDetails extends Component {
                 </p>
               </div>
             ))}
-            <Button variant="primary">Adicionar ao carrinho</Button>
+            <Button
+              variant="primary"
+              data-testid="product-detail-add-to-cart"
+              onClick={ () => this.tryToGet(productId) }
+            >
+              Adicionar ao carrinho
+            </Button>
           </Card.Body>
         </Card>
-      </div>
+        <p>{ productQuantity }</p>
+      </div> // adicionando esse p de cima só pra mostrar a quantidade na hora
     );
   }
 }
