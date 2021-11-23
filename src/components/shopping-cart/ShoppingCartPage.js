@@ -18,20 +18,17 @@ class ShoppingCartPage extends Component {
     // pegar todas as keys
     const keys = Object.keys(localStorage);
     const objectArray = [];
-
-    // procurar na API as infos desses itens
-    for (let i = 0; i < keys.length; i += 1) {
-      const response = await getProductById(keys[i]); // aqui tem o id, title, etc, lint reclamou disso, https://eslint.org/docs/rules/no-await-in-loop#when-not-to-use-it, nao entendi como resolver
-      const value = localStorage.getItem(`${keys[i]}`); // aqui tem a quantidade
+    keys.map(async (produt) => {
+      const response = await getProductById(produt); // aqui tem o id, title, etc, lint reclamou disso, https://eslint.org/docs/rules/no-await-in-loop#when-not-to-use-it, nao entendi como resolver
+      const value = localStorage.getItem(`${produt}`); // aqui tem a quantidade
       const tmprObj = {
         name: response.title,
         quantity: value,
       };
       objectArray.push(tmprObj);
-    }
-    // setar o array como o array de informacoes
-    this.setState({
-      allItems: objectArray,
+      this.setState({
+        allItems: objectArray,
+      });
     });
   }
 
