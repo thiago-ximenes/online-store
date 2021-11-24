@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Button } from 'react-bootstrap';
 import { getProductById } from '../../services/api';
 
 class ShoppingCartPage extends Component {
@@ -23,7 +24,7 @@ class ShoppingCartPage extends Component {
       const value = localStorage.getItem(`${produt}`); // aqui tem a quantidade
       const tmprObj = {
         name: response.title,
-        quantity: value,
+        quantity: parseInt(value, 10),
       };
       objectArray.push(tmprObj);
       this.setState({
@@ -32,20 +33,38 @@ class ShoppingCartPage extends Component {
     });
   }
 
+  handleClick = (index, operation) => {
+    const { allItems } = this.state;
+    if (operation) allItems[index].quantity += 1;
+    else if (allItems[index].quantity > 0) allItems[index].quantity -= 1;
+    this.setState({ allItems });
+  }
+
   render() {
     const { allItems } = this.state;
+    const { handleClick } = this;
     return (
       <div>
         <ul>
           {allItems.length === 0
             ? <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
             : (
-              allItems.map((product) => (
+              allItems.map((product, index) => (
                 <li key={ product.id }>
                   <p data-testid="shopping-cart-product-name">
                     { product.name }
                   </p>
                   <p data-testid="shopping-cart-product-quantity">{ product.quantity }</p>
+                  <Button
+                    onClick={ () => handleClick(index, true) }
+                  >
+                    +
+                  </Button>
+                  <Button
+                    onClick={ () => handleClick(index, false) }
+                  >
+                    -
+                  </Button>
                 </li>
               ))
             )}
