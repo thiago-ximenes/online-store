@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Button } from 'react-bootstrap';
+import { Card, Button, Form } from 'react-bootstrap';
 import { PropTypes } from 'prop-types';
 import { getProductById } from '../services/api';
 import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
@@ -14,6 +14,7 @@ class ProductDetails extends Component {
       atributtesProduct: [],
       productId: '',
       productQuantity: 0,
+      input: '',
     };
     this.tryToGet = this.tryToGet.bind(this);
   }
@@ -53,6 +54,10 @@ class ProductDetails extends Component {
     }
   }
 
+  handleInputClick = ({ target: { value } }) => {
+    this.setState({ input: value });
+  }
+
   // quando carregar tentar pegar uma key igual ao productId // localstorage getItem
   tryToGet(productId) {
     this.setState({
@@ -83,7 +88,9 @@ class ProductDetails extends Component {
       atributtesProduct,
       productId,
       productQuantity,
+      input,
     } = this.state;
+    const { handleInputClick } = this;
     return (
       <div>
         <ShoppingCartButton data-testid="shopping-cart-button" />
@@ -113,6 +120,12 @@ class ProductDetails extends Component {
             >
               Adicionar ao carrinho
             </Button>
+            <Form.Control
+              as="textarea"
+              value={ input }
+              onChange={ handleInputClick }
+              data-testid="product-detail-evaluation"
+            />
           </Card.Body>
         </Card>
         <p>{ productQuantity }</p>
