@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, Button } from 'react-bootstrap';
 import { PropTypes } from 'prop-types';
 
@@ -23,19 +24,25 @@ class ProductCard extends Component {
   }
 
   render() {
-    const { product, price, img, productId } = this.props; // adicionando o productId pra poder usar a funcao com ele
+    const { product, price, img, productId } = this.props;
+    // adicionando o productId pra poder usar a funcao com ele
     return (
       <Card style={ { width: '18rem' } } data-testid="product">
-        <Card.Img variant="top" src={ img } />
         <Card.Body>
-          <Card.Title>{ product }</Card.Title>
-          <Card.Text>{ price }</Card.Text>
+          <Link
+            to={ `/product-details/${productId}` }
+            data-testid="product-detail-link"
+          >
+            <Card.Img variant="top" src={ img } />
+            <Card.Title>{ product }</Card.Title>
+            <Card.Text>{ price }</Card.Text>
+          </Link>
           <Button
             variant="primary"
             onClick={ () => this.tryToGet(productId) }
             data-testid="product-add-to-cart" // adicionando esse testid que faltava
           >
-            Go somewhere
+            Adicionar ao carrinho
           </Button>
         </Card.Body>
       </Card>
@@ -47,7 +54,7 @@ ProductCard.propTypes = {
   product: PropTypes.string.isRequired,
   price: PropTypes.number.isRequired,
   img: PropTypes.string.isRequired,
-  productId: PropTypes.number.isRequired,
+  productId: PropTypes.string.isRequired,
 };
 
 export default ProductCard;

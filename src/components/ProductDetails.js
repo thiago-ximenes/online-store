@@ -21,6 +21,7 @@ class ProductDetails extends Component {
 
   componentDidMount() {
     const { props: { match: { params: { id } } } } = this;
+    console.log(id);
     this.getProduct(id);
     this.getQuantity(id);
   }
