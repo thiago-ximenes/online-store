@@ -28,7 +28,6 @@ class ProductDetails extends Component {
 
   getProduct = async (id) => {
     const response = await getProductById(id);
-    console.log(response);
     this.setState(({
       productName: response.title,
       img: response.thumbnail,
@@ -102,7 +101,7 @@ class ProductDetails extends Component {
             <p>
               R$
               {' '}
-              { priceProduct }
+              { priceProduct.toFixed(2) }
             </p>
             {atributtesProduct.map((value) => (
               <div key={ value.id }>
@@ -129,7 +128,11 @@ class ProductDetails extends Component {
             />
           </Card.Body>
         </Card>
-        <p>{ productQuantity }</p>
+        <p>
+          Quantidade:
+          {' '}
+          { productQuantity }
+        </p>
       </div> // adicionando esse p de cima só pra mostrar a quantidade na hora
     );
   }

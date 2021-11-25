@@ -30,6 +30,7 @@ class ShoppingCartPage extends Component {
           const tmprObj = {
             price: response.price,
             id: response.id,
+            img: response.thumbnail,
             name: response.title,
             quantity: parseInt(value, 10),
           };
@@ -97,10 +98,18 @@ class ShoppingCartPage extends Component {
                       <p data-testid="shopping-cart-product-name">
                         { product.name }
                       </p>
+                      <img src={ product.img } alt={ product.name } />
                       <p
                         data-testid="shopping-cart-product-quantity"
                       >
+                        Quantidade:
+                        {' '}
                         { product.quantity }
+                      </p>
+                      <p>
+                        Preço: R$
+                        {' '}
+                        { product.price.toFixed(2) }
                       </p>
                       <Button
                         data-testid="product-increase-quantity"
@@ -122,8 +131,9 @@ class ShoppingCartPage extends Component {
                     </li>
                   ))
                 )}
+              <p />
               <p>
-                { `Total: R$ ${totalPrice} `}
+                { `Total: R$ ${totalPrice.toFixed(2)} `}
               </p>
             </ul>
           </div>

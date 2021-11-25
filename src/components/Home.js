@@ -63,6 +63,7 @@ class Home extends Component {
               onChange={ handleChange }
               value={ input }
               data-testid="query-input"
+              placeholder="Pesquise um produto ..."
             />
           </Form.Group>
           <Button
