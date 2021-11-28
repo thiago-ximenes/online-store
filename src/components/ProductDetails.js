@@ -21,7 +21,6 @@ class ProductDetails extends Component {
 
   componentDidMount() {
     const { props: { match: { params: { id } } } } = this;
-    console.log(id);
     this.getProduct(id);
     this.getQuantity(id);
   }
@@ -58,22 +57,26 @@ class ProductDetails extends Component {
     this.setState({ input: value });
   }
 
-  // quando carregar tentar pegar uma key igual ao productId // localstorage getItem
   tryToGet(productId) {
+    const toLocalStorage = [];
     this.setState({
       productId,
     });
-    const productsBought = localStorage.getItem(`${productId}`);
+    const productsBought = localStorage.getItem('cartItems');
+    console.log(productsBought);
     if (productsBought === null) {
-      localStorage.setItem(`${productId}`, 1);
-      console.log(localStorage.getItem(`${productId}`));
+      const obj = {
+        [productId]: 1,
+      };
+      toLocalStorage.push(obj);
+      localStorage.setItem('cartItems', JSON.stringify(toLocalStorage));
       this.setState({
-        productQuantity: localStorage.getItem(`${productId}`),
+        productQuantity: localStorage.getItem(JSON.stringify(productId)),
       });
     } else {
-      const actualQuantity = parseInt(localStorage.getItem(`${productId}`) ?? '0', 10);
+      const actualQuantity = JSON.parse((localStorage.getItem('cartItems')));
+      console.log(actualQuantity);
       localStorage.setItem(`${productId}`, (actualQuantity + 1).toString());
-      console.log(localStorage.getItem(`${productId}`));
       this.setState({
         productQuantity: localStorage.getItem(`${productId}`),
       });

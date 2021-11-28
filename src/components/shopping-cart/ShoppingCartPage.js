@@ -19,29 +19,25 @@ class ShoppingCartPage extends Component {
 
   // setar funcao pra procurar itens no localstorage
   async getItemsInCart() {
-    this.setState({ loading: true },
-      () => {
-        // pegar todas as keys
-        const keys = Object.keys(localStorage);
-        const objectArray = [];
-        keys.map(async (product) => {
-          const response = await getProductById(product); // aqui tem o id, title, etc, lint reclamou disso, https://eslint.org/docs/rules/no-await-in-loop#when-not-to-use-it, nao entendi como resolver
-          const value = localStorage.getItem(`${product}`); // aqui tem a quantidade
-          const tmprObj = {
-            price: response.price,
-            id: response.id,
-            img: response.thumbnail,
-            name: response.title,
-            quantity: parseInt(value, 10),
-          };
-          objectArray.push(tmprObj);
-          this.setState({
-            allItems: objectArray,
-          });
-          this.sumTotal();
-        });
+    // pegar todas as keys
+    const keys = Object.keys(localStorage);
+    const objectArray = [];
+    keys.forEach(async (product) => {
+      const response = await getProductById(product); // aqui tem o id, title, etc, lint reclamou disso, https://eslint.org/docs/rules/no-await-in-loop#when-not-to-use-it, nao entendi como resolver
+      const value = localStorage.getItem(`${product}`); // aqui tem a quantidade
+      const tmprObj = {
+        price: response.price,
+        id: response.id,
+        img: response.thumbnail,
+        name: response.title,
+        quantity: parseInt(value, 10),
+      };
+      objectArray.push(tmprObj);
+      this.setState({
+        allItems: objectArray,
       });
-    this.setState({ loading: false });
+    });
+    this.sumTotal();
   }
 
   handleClick = async (index, operation, productId) => {
@@ -85,6 +81,7 @@ class ShoppingCartPage extends Component {
   render() {
     const { allItems, totalPrice, loading } = this.state;
     const { handleClick } = this;
+    console.log(allItems);
     return (
       loading ? (<Loading />)
         : (

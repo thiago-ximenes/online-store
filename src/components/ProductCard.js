@@ -14,7 +14,7 @@ class ProductCard extends Component {
     const productsBought = localStorage.getItem(`${productId}`);
     // Aqui comecou a ficar repetitivo talvez?
     if (productsBought === null) {
-      localStorage.setItem(`${productId}`, 1);
+      localStorage.setItem('cartItems', `${productId}: 1`);
     } else {
       const actualQuantity = parseInt(localStorage.getItem(`${productId}`) ?? '0', 10);
       localStorage.setItem(`${productId}`, (actualQuantity + 1).toString());
