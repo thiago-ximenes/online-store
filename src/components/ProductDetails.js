@@ -3,6 +3,7 @@ import { Card, Button, Form } from 'react-bootstrap';
 import { PropTypes } from 'prop-types';
 import { getProductById } from '../services/api';
 import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
+import { tryToGet, getFromLocalStorage } from '../services/localStorage';
 
 class ProductDetails extends Component {
   constructor() {
@@ -12,11 +13,10 @@ class ProductDetails extends Component {
       img: '',
       priceProduct: 0,
       atributtesProduct: [],
-      productId: '',
+      product: '',
       productQuantity: 0,
       input: '',
     };
-    this.tryToGet = this.tryToGet.bind(this);
   }
 
   componentDidMount() {
@@ -32,23 +32,25 @@ class ProductDetails extends Component {
       img: response.thumbnail,
       priceProduct: response.price,
       atributtesProduct: [...response.attributes],
-      productId: response.id,
+      product: response,
     }));
   };
 
   // pegar a quantidade quando inicia a página
   getQuantity(id) {
-    this.setState({
-      productId: id,
-    });
-    const productsBought = localStorage.getItem(`${id}`);
-    if (productsBought === null) {
+    let productsBought;
+    if (getFromLocalStorage()) {
+      productsBought = JSON.parse(getFromLocalStorage())
+        .find((product) => product.id === id);
+    }
+    if (!productsBought) {
       this.setState({
         productQuantity: 0,
       });
     } else {
+      console.log(productsBought);
       this.setState({
-        productQuantity: productsBought,
+        productQuantity: productsBought.quantity,
       });
     }
   }
@@ -57,30 +59,8 @@ class ProductDetails extends Component {
     this.setState({ input: value });
   }
 
-  tryToGet(productId) {
-    const toLocalStorage = [];
-    this.setState({
-      productId,
-    });
-    const productsBought = localStorage.getItem('cartItems');
-    console.log(productsBought);
-    if (productsBought === null) {
-      const obj = {
-        [productId]: 1,
-      };
-      toLocalStorage.push(obj);
-      localStorage.setItem('cartItems', JSON.stringify(toLocalStorage));
-      this.setState({
-        productQuantity: localStorage.getItem(JSON.stringify(productId)),
-      });
-    } else {
-      const actualQuantity = JSON.parse((localStorage.getItem('cartItems')));
-      console.log(actualQuantity);
-      localStorage.setItem(`${productId}`, (actualQuantity + 1).toString());
-      this.setState({
-        productQuantity: localStorage.getItem(`${productId}`),
-      });
-    }
+  fromLocalStorageToState = (productId) => {
+    tryToGet(productId);
   }
 
   render() {
@@ -89,11 +69,11 @@ class ProductDetails extends Component {
       img,
       priceProduct,
       atributtesProduct,
-      productId,
+      product,
       productQuantity,
       input,
     } = this.state;
-    const { handleInputClick } = this;
+    const { handleInputClick, fromLocalStorageToState } = this;
     return (
       <div>
         <ShoppingCartButton data-testid="shopping-cart-button" />
@@ -119,7 +99,7 @@ class ProductDetails extends Component {
             <Button
               variant="primary"
               data-testid="product-detail-add-to-cart"
-              onClick={ () => this.tryToGet(productId) }
+              onClick={ () => fromLocalStorageToState(product) }
             >
               Adicionar ao carrinho
             </Button>
