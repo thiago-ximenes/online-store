@@ -26,7 +26,6 @@ class ShoppingCartButton extends Component {
       <>
         <Button
           onClick={ handleClick }
-          type="submit"
           data-testid="shopping-cart-button"
         >
           shopping cart

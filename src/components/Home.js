@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
 import ProductCard from './ProductCard';
 import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
@@ -64,6 +63,7 @@ class Home extends Component {
               onChange={ handleChange }
               value={ input }
               data-testid="query-input"
+              placeholder="Pesquise um produto ..."
             />
           </Form.Group>
           <Button
@@ -89,17 +89,12 @@ class Home extends Component {
         { status ? (<span> Nenhum produto foi encontrado</span>) : (
           listProducts.map((product) => (
             <div key={ product.id }>
-              <Link
-                to={ `/product-details/${product.id}` }
-                data-testid="product-detail-link"
-              >
-                <ProductCard
-                  product={ product.title }
-                  price={ product.price }
-                  img={ product.thumbnail }
-                  productId={ product.id } // adicionando esse novo pro product card receber
-                />
-              </Link>
+              <ProductCard
+                productName={ product.title }
+                price={ product.price }
+                img={ product.thumbnail }
+                product={ product } // adicionando esse novo pro product card receber
+              />
             </div>
           )))}
       </>

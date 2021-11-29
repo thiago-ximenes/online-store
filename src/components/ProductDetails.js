@@ -3,6 +3,7 @@ import { Card, Button, Form } from 'react-bootstrap';
 import { PropTypes } from 'prop-types';
 import { getProductById } from '../services/api';
 import ShoppingCartButton from './shopping-cart/ShoppingCartButton';
+import { tryToGet, getFromLocalStorage } from '../services/localStorage';
 
 class ProductDetails extends Component {
   constructor() {
@@ -12,11 +13,10 @@ class ProductDetails extends Component {
       img: '',
       priceProduct: 0,
       atributtesProduct: [],
-      productId: '',
+      product: '',
       productQuantity: 0,
       input: '',
     };
-    this.tryToGet = this.tryToGet.bind(this);
   }
 
   componentDidMount() {
@@ -27,29 +27,30 @@ class ProductDetails extends Component {
 
   getProduct = async (id) => {
     const response = await getProductById(id);
-    console.log(response);
     this.setState(({
       productName: response.title,
       img: response.thumbnail,
       priceProduct: response.price,
       atributtesProduct: [...response.attributes],
-      productId: response.id,
+      product: response,
     }));
   };
 
   // pegar a quantidade quando inicia a página
   getQuantity(id) {
-    this.setState({
-      productId: id,
-    });
-    const productsBought = localStorage.getItem(`${id}`);
-    if (productsBought === null) {
+    let productsBought;
+    if (getFromLocalStorage()) {
+      productsBought = JSON.parse(getFromLocalStorage())
+        .find((product) => product.id === id);
+    }
+    if (!productsBought) {
       this.setState({
         productQuantity: 0,
       });
     } else {
+      console.log(productsBought);
       this.setState({
-        productQuantity: productsBought,
+        productQuantity: productsBought.quantity,
       });
     }
   }
@@ -58,26 +59,8 @@ class ProductDetails extends Component {
     this.setState({ input: value });
   }
 
-  // quando carregar tentar pegar uma key igual ao productId // localstorage getItem
-  tryToGet(productId) {
-    this.setState({
-      productId,
-    });
-    const productsBought = localStorage.getItem(`${productId}`);
-    if (productsBought === null) {
-      localStorage.setItem(`${productId}`, 1);
-      console.log(localStorage.getItem(`${productId}`));
-      this.setState({
-        productQuantity: localStorage.getItem(`${productId}`),
-      });
-    } else {
-      const actualQuantity = parseInt(localStorage.getItem(`${productId}`) ?? '0', 10);
-      localStorage.setItem(`${productId}`, (actualQuantity + 1).toString());
-      console.log(localStorage.getItem(`${productId}`));
-      this.setState({
-        productQuantity: localStorage.getItem(`${productId}`),
-      });
-    }
+  fromLocalStorageToState = (productId) => {
+    tryToGet(productId);
   }
 
   render() {
@@ -86,11 +69,11 @@ class ProductDetails extends Component {
       img,
       priceProduct,
       atributtesProduct,
-      productId,
+      product,
       productQuantity,
       input,
     } = this.state;
-    const { handleInputClick } = this;
+    const { handleInputClick, fromLocalStorageToState } = this;
     return (
       <div>
         <ShoppingCartButton data-testid="shopping-cart-button" />
@@ -101,7 +84,7 @@ class ProductDetails extends Component {
             <p>
               R$
               {' '}
-              { priceProduct }
+              { priceProduct.toFixed(2) }
             </p>
             {atributtesProduct.map((value) => (
               <div key={ value.id }>
@@ -116,7 +99,7 @@ class ProductDetails extends Component {
             <Button
               variant="primary"
               data-testid="product-detail-add-to-cart"
-              onClick={ () => this.tryToGet(productId) }
+              onClick={ () => fromLocalStorageToState(product) }
             >
               Adicionar ao carrinho
             </Button>
@@ -128,7 +111,11 @@ class ProductDetails extends Component {
             />
           </Card.Body>
         </Card>
-        <p>{ productQuantity }</p>
+        <p>
+          Quantidade:
+          {' '}
+          { productQuantity }
+        </p>
       </div> // adicionando esse p de cima só pra mostrar a quantidade na hora
     );
   }

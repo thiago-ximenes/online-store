@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
-import { getProductById } from '../../services/api';
+// import { getProductById } from '../../services/api';
+import Loading from '../Loading';
+import { getFromLocalStorage, saveToLocalStorage } from '../../services/localStorage';
 
 class ShoppingCartPage extends Component {
   constructor() {
     super();
     this.state = {
       allItems: [],
+      totalPrice: 0,
+      loading: false,
     };
   }
 
@@ -17,59 +21,98 @@ class ShoppingCartPage extends Component {
   // setar funcao pra procurar itens no localstorage
   async getItemsInCart() {
     // pegar todas as keys
-    const keys = Object.keys(localStorage);
-    const objectArray = [];
-    keys.map(async (produt) => {
-      const response = await getProductById(produt); // aqui tem o id, title, etc, lint reclamou disso, https://eslint.org/docs/rules/no-await-in-loop#when-not-to-use-it, nao entendi como resolver
-      const value = localStorage.getItem(`${produt}`); // aqui tem a quantidade
-      const tmprObj = {
-        name: response.title,
-        quantity: parseInt(value, 10),
-      };
-      objectArray.push(tmprObj);
-      this.setState({
-        allItems: objectArray,
-      });
-    });
+    const storage = JSON.parse(getFromLocalStorage());
+    let total = 0;
+    if (storage) total = this.sumTotal(storage);
+    this.setState({
+      allItems: storage,
+    },
+    this.setState({ totalPrice: total }));
   }
 
-  handleClick = (index, operation) => {
+  handleClick = async (operation, product) => {
     const { allItems } = this.state;
-    if (operation) allItems[index].quantity += 1;
-    else if (allItems[index].quantity > 0) allItems[index].quantity -= 1;
+    const productClicked = allItems.find((item) => item.id === product.id);
+    if (operation === 'remove') {
+      localStorage.removeItem(product.id.toString());
+      await this.getItemsInCart();
+      if (allItems.length === 1) {
+        this.setState({ allItems: [] });
+      }
+    }
+    if (operation === true) {
+      productClicked.quantity += 1;
+    } else if (productClicked.quantity > 1) {
+      productClicked.quantity -= 1;
+    }
     this.setState({ allItems });
+    saveToLocalStorage(JSON.stringify(allItems));
+  }
+
+  sumTotal = (productList) => {
+    let sum = 0;
+    productList.forEach((product) => {
+      sum += product.price * product.quantity;
+    });
+    return sum;
   }
 
   render() {
-    const { allItems } = this.state;
+    const { allItems, totalPrice, loading } = this.state;
     const { handleClick } = this;
     return (
-      <div>
-        <ul>
-          {allItems.length === 0
-            ? <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
-            : (
-              allItems.map((product, index) => (
-                <li key={ product.id }>
-                  <p data-testid="shopping-cart-product-name">
-                    { product.name }
-                  </p>
-                  <p data-testid="shopping-cart-product-quantity">{ product.quantity }</p>
-                  <Button
-                    onClick={ () => handleClick(index, true) }
-                  >
-                    +
-                  </Button>
-                  <Button
-                    onClick={ () => handleClick(index, false) }
-                  >
-                    -
-                  </Button>
-                </li>
-              ))
-            )}
-        </ul>
-      </div>
+      loading ? (<Loading />)
+        : (
+          <div>
+            <ul>
+              {!allItems
+                ? <p data-testid="shopping-cart-empty-message">Seu carrinho está vazio</p>
+                : (
+                  allItems.map((product) => (
+                    <li key={ product.id }>
+                      <p data-testid="shopping-cart-product-name">
+                        { product.name }
+                      </p>
+                      <img src={ product.img } alt={ product.name } />
+                      <p
+                        data-testid="shopping-cart-product-quantity"
+                      >
+                        Quantidade:
+                        {' '}
+                        { product.quantity }
+                      </p>
+                      <p>
+                        Preço: R$
+                        {' '}
+                        { product.price }
+                      </p>
+                      <Button
+                        data-testid="product-increase-quantity"
+                        onClick={ () => handleClick(true, product) }
+                      >
+                        +
+                      </Button>
+                      <Button
+                        data-testid="product-decrease-quantity"
+                        onClick={ () => handleClick(false, product) }
+                      >
+                        -
+                      </Button>
+                      <Button
+                        onClick={ () => handleClick('remove', product) }
+                      >
+                        X
+                      </Button>
+                    </li>
+                  ))
+                )}
+              <p />
+              <p>
+                { `Total: R$ ${totalPrice.toFixed(2)} `}
+              </p>
+            </ul>
+          </div>
+        )
     );
   }
 }
